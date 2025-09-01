@@ -1,0 +1,7 @@
+bno085_imu:
+  ros__parameters:
+    i2c_bus: 3
+    i2c_address: "0x4B"
+    frame_id: "imu_link"
+    pub_rate_hz: 50
+    imu_topic: "/imu/data"
