@@ -111,17 +111,47 @@ class BNO085ImuNode(Node):
             self.get_logger().warn(f'Mag read failed: {e}')
 
 def main():
-    rclpy.init()
+    import rclpy
     node = None
     try:
+        rclpy.init()
         node = BNO085ImuNode()
         rclpy.spin(node)
+    except KeyboardInterrupt:
+        # Normales Abbrechen mit Ctrl-C: kein Log, keine Tracebacks
+        pass
     except Exception as e:
-        print(f"Node failed: {e}")
+        # Unerwarteter Fehler: kurz loggen
+        try:
+            if node is not None:
+                node.get_logger().error(f"Node failed: {e}")
+            else:
+                print(f"Node failed before init: {e}")
+        except Exception:
+            pass
     finally:
-        if node is not None:
-            node.destroy_node()
-        rclpy.shutdown()
+        # Timer stoppen, Sensor/I2C sauber schließen
+        try:
+            if node is not None:
+                if hasattr(node, "timer") and node.timer is not None:
+                    node.timer.cancel()
+                # Falls du ein I2C-Objekt/IMU-Objekt hast, freundlich deinit:
+                if hasattr(node, "i2c") and hasattr(node.i2c, "deinit"):
+                    try: node.i2c.deinit()
+                    except Exception: pass
+                if hasattr(node, "imu") and hasattr(node.imu, "deinit"):
+                    try: node.imu.deinit()
+                    except Exception: pass
+                node.destroy_node()
+        except Exception:
+            pass
+        # Shutdown nur, wenn noch nicht erfolgt:
+        try:
+            if rclpy.ok():
+                rclpy.shutdown()
+        except Exception:
+            pass
+
 
 if __name__ == '__main__':
     main()
