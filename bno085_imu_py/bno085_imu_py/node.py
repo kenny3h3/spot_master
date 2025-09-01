@@ -5,8 +5,8 @@ from rclpy.node import Node
 from rclpy.time import Time
 from sensor_msgs.msg import Imu
 from sensor_msgs.msg import MagneticField
-from adafruit_extended_bus import ExtendedI2C as I2C
-from adafruit_bno08x.i2c import BNO08X_I2C
+from adafruit_circuitpython_extended_bus import ExtendedI2C as I2C  # Angepasster Import
+from adafruit_bno08x.i2c import BNO08X_I2C  # Unverändert, da intern korrekt
 from adafruit_bno08x import (
     BNO_REPORT_ACCELEROMETER,
     BNO_REPORT_GYROSCOPE,
@@ -25,23 +25,29 @@ class BNO085ImuNode(Node):
         self.declare_parameter('i2c_address', 0x4B)
         self.declare_parameter('frame_id', 'imu_link')
         self.declare_parameter('pub_rate_hz', 50)
+        self.declare_parameter('imu_topic', '/imu/data')
 
         bus = int(self.get_parameter('i2c_bus').value)
         addr = int(self.get_parameter('i2c_address').value)
         self.frame_id = str(self.get_parameter('frame_id').value)
         rate_hz = float(self.get_parameter('pub_rate_hz').value)
+        imu_topic = str(self.get_parameter('imu_topic').value)
 
         self.get_logger().info(f'Opening BNO085 on I2C bus={bus} addr=0x{addr:02X}')
-        i2c = I2C(bus)
-        self.imu = BNO08X_I2C(i2c, address=addr)
+        try:
+            i2c = I2C(bus)
+            self.imu = BNO08X_I2C(i2c, address=addr)
+            self.get_logger().info('BNO085 initialized successfully')
+        except Exception as e:
+            self.get_logger().error(f'Failed to initialize BNO085: {e}')
+            raise
 
-        # Enable desired features
         self.imu.enable_feature(BNO_REPORT_ACCELEROMETER)
         self.imu.enable_feature(BNO_REPORT_GYROSCOPE)
         self.imu.enable_feature(BNO_REPORT_ROTATION_VECTOR)
         self.imu.enable_feature(BNO_REPORT_MAGNETOMETER)
 
-        self.pub = self.create_publisher(Imu, 'imu', 10) 
+        self.pub = self.create_publisher(Imu, imu_topic, 10)
         self.mag_pub = self.create_publisher(MagneticField, 'mag', 10)
         period = 1.0 / rate_hz if rate_hz > 0 else 0.02
         self.timer = self.create_timer(period, self.publish_imu)
@@ -53,41 +59,43 @@ class BNO085ImuNode(Node):
         msg.header.frame_id = self.frame_id
 
         try:
-            # Orientation (quaternion)
-            q = self.imu.quaternion  # (w,x,y,z) or None
+            q = self.imu.quaternion
             if q:
-                x,y,z,w = quat_wxyz_to_xyzw(q)
+                x, y, z, w = quat_wxyz_to_xyzw(q)
                 msg.orientation.x = x
                 msg.orientation.y = y
                 msg.orientation.z = z
                 msg.orientation.w = w
+            else:
+                self.get_logger().warn('No quaternion data available')
 
-            # Angular velocity (rad/s)
-            g = self.imu.gyro  # (x,y,z) rad/s
+            g = self.imu.gyro
             if g:
                 msg.angular_velocity.x = g[0]
                 msg.angular_velocity.y = g[1]
                 msg.angular_velocity.z = g[2]
+            else:
+                self.get_logger().warn('No gyro data available')
 
-            # Linear acceleration (m/s^2)
-            a = self.imu.acceleration  # (x,y,z) m/s^2
+            a = self.imu.acceleration
             if a:
                 msg.linear_acceleration.x = a[0]
                 msg.linear_acceleration.y = a[1]
                 msg.linear_acceleration.z = a[2]
+            else:
+                self.get_logger().warn('No acceleration data available')
 
-            # Covariances unbekannt → -1 (nicht bereitgestellt)
             msg.orientation_covariance[0] = -1.0
             msg.angular_velocity_covariance[0] = -1.0
             msg.linear_acceleration_covariance[0] = -1.0
 
             self.pub.publish(msg)
+            self.get_logger().debug('Published IMU data')
         except Exception as e:
             self.get_logger().warn(f'IMU read failed: {e}')
 
-	# Magnetometer (µT)
         try:
-            m = self.imu.magnetic  # (x,y,z) µTesla
+            m = self.imu.magnetic
             if m:
                 mag_msg = MagneticField()
                 mag_msg.header.stamp = now
@@ -95,13 +103,23 @@ class BNO085ImuNode(Node):
                 mag_msg.magnetic_field.x = m[0]
                 mag_msg.magnetic_field.y = m[1]
                 mag_msg.magnetic_field.z = m[2]
-            self.mag_pub.publish(mag_msg)
+                self.mag_pub.publish(mag_msg)
+                self.get_logger().debug('Published magnetic field data')
+            else:
+                self.get_logger().warn('No magnetic field data available')
         except Exception as e:
-    	    self.get_logger().warn(f'Mag read failed: {e}')
+            self.get_logger().warn(f'Mag read failed: {e}')
 
 def main():
     rclpy.init()
-    node = BNO085ImuNode()
-    rclpy.spin(node)
-    node.destroy_node()
-    rclpy.shutdown()
+    try:
+        node = BNO085ImuNode()
+        rclpy.spin(node)
+    except Exception as e:
+        print(f'Node failed: {e}')
+    finally:
+        node.destroy_node()
+        rclpy.shutdown()
+
+if __name__ == '__main__':
+    main()

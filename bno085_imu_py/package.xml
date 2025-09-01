@@ -3,14 +3,19 @@
   <name>bno085_imu_py</name>
   <version>0.1.0</version>
   <description>ROS 2 IMU publisher for BNO085 using Adafruit I2C (no IRQ)</description>
-  <maintainer email="you@example.com">you</maintainer>
-  <license>MIT</license>
+  <maintainer email="winston@example.com">winston</maintainer>
+  <license>Apache License 2.0</license>
 
   <buildtool_depend>ament_python</buildtool_depend>
+  <depend>rclpy</depend>
+  <depend>sensor_msgs</depend>
+  <depend>builtin_interfaces</depend>
+  <!-- Hinweis: adafruit_bno08x und adafruit_extended_bus müssen via pip installiert werden -->
+  <!-- <depend>adafruit_bno08x</depend> -->
+  <!-- <depend>adafruit_extended_bus</depend> -->
 
-  <exec_depend>rclpy</exec_depend>
-  <exec_depend>sensor_msgs</exec_depend>
-  <exec_depend>builtin_interfaces</exec_depend>
+  <test_depend>ament_lint_auto</test_depend>
+  <test_depend>ament_lint_common</test_depend>
 
   <export>
     <build_type>ament_python</build_type>
