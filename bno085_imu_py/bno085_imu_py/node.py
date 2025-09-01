@@ -112,13 +112,15 @@ class BNO085ImuNode(Node):
 
 def main():
     rclpy.init()
+    node = None
     try:
         node = BNO085ImuNode()
         rclpy.spin(node)
     except Exception as e:
-        print(f'Node failed: {e}')
+        print(f"Node failed: {e}")
     finally:
-        node.destroy_node()
+        if node is not None:
+            node.destroy_node()
         rclpy.shutdown()
 
 if __name__ == '__main__':
