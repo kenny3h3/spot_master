@@ -20,7 +20,7 @@ setup(
     install_requires=[
         'setuptools',
         'adafruit-circuitpython-bno08x',
-        'adafruit-circuitpython-extended-bus'
+        'adafruit-extended-bus'  # Korrigierter Paketname
     ],
     zip_safe=True,
     maintainer='winston',

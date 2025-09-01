@@ -5,8 +5,8 @@ from rclpy.node import Node
 from rclpy.time import Time
 from sensor_msgs.msg import Imu
 from sensor_msgs.msg import MagneticField
-from adafruit_circuitpython_extended_bus import ExtendedI2C as I2C  # Angepasster Import
-from adafruit_bno08x.i2c import BNO08X_I2C  # Unverändert, da intern korrekt
+from adafruit_extended_bus import ExtendedI2C as I2C  # Korrigierter Import
+from adafruit_bno08x.i2c import BNO08X_I2C
 from adafruit_bno08x import (
     BNO_REPORT_ACCELEROMETER,
     BNO_REPORT_GYROSCOPE,
