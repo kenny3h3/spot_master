@@ -352,4 +352,4 @@ void ForwardMotion::on_quit() {
   tcsetattr(STDIN_FILENO, TCSANOW, &old_chars);
 }
 
-DECLARE_STATE_NODE_CLASS("walking_gait", ForwardMotion, 30ms)
+DECLARE_STATE_NODE_CLASS("walking_gait", ForwardMotion, 15ms)
