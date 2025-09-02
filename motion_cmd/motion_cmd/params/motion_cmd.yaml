@@ -1,0 +1,37 @@
+motion_cmd:
+  ros__parameters:
+    update_rate_hz: 100.0
+    use_imu: false
+    imu_topic: "/imu/data"
+
+    # output_mode: "pwm" or "states"
+    output_mode: "pwm"
+
+    # Dual board config (topics will be 'servos_proportional_<bus>')
+    front_bus: 6
+    back_bus: 4
+
+    # Optional: publish to SMOV States instead (set output_mode: "states")
+    front_state_topic: "/smov/front_state"
+    back_state_topic: "/smov/back_state"
+
+    # Gait parameters (basic trot template)
+    gait:
+      type: "dual_board_trot"
+      stand_height_m: 0.155
+      body_length_m: 0.186
+      body_width_m: 0.078
+      link_hip_m: 0.055
+      link_upper_m: 0.1075
+      link_lower_m: 0.130
+      step_frequency_hz: 1.8
+      step_height: 0.04
+      max_stride: 0.08
+
+    # Simple mapping of 12 servos across two boards (indices 0..11 -> channel numbers)
+    # Order: FL [abd, hip, knee], FR [...], BL [...], BR [...]
+    channels_front: [0,1,2,  3,4,5]     # 6 channels used on front board
+    channels_back:  [0,1,2,  3,4,5]     # 6 channels used on back board
+
+    # Scale outputs (proportional) clamp to [-1,1]
+    proportional_scale: 0.5
