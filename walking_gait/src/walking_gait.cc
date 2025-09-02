@@ -127,7 +127,7 @@ void ForwardMotion::turn() {
   if (!leg1_motion_done) {
     if (coord1.z < 9.95f) {
       coord1.z = smov::Functions::lerp(coord1.z, 10.0f, 0.15f);
-      coord1.y = curved(coord1.z, 15.0f, 0.0f);
+      coord1.y = curved(coord1.z, 10.0f, 0.0f);
       trig.set_leg_to(1, coord1);
     } else {
       leg1_motion_done = true;
@@ -143,7 +143,7 @@ void ForwardMotion::turn() {
   if (!leg4_motion_done) {
     if (coord4.z < 9.95f) {
       coord4.z = smov::Functions::lerp(coord4.z, 10.0f, 0.15f);
-      coord4.y = curved(coord4.z, 15.0f, back_leg_gap);
+      coord4.y = curved(coord4.z, 10.0f, back_leg_gap);
       trig.set_leg_to(4, coord4);
     } else {
       leg4_motion_done = true;
@@ -159,7 +159,7 @@ void ForwardMotion::turn() {
   if (!leg2_motion_done) {
     if (coord2.z < 9.95f) {
       coord2.z = smov::Functions::lerp(coord2.z, 10.0f, 0.15f);
-      coord2.y = curved(coord2.z, 15.0f, 0.0f);
+      coord2.y = curved(coord2.z, 10.0f, 0.0f);
       trig.set_leg_to(2, coord2);
     } else {
       leg2_motion_done = true;
@@ -175,7 +175,7 @@ void ForwardMotion::turn() {
   if (!leg3_motion_done) {
     if (coord3.z < 9.95f) {
       coord3.z = smov::Functions::lerp(coord3.z, 10.0f, 0.15f);
-      coord3.y = curved(coord3.z, 15.0f, back_leg_gap);
+      coord3.y = curved(coord3.z, 10.0f, back_leg_gap);
       trig.set_leg_to(3, coord3);
     } else {
       leg3_motion_done = true;
