@@ -8,8 +8,8 @@ smov_config:
     back_board_i2c_bus: 4
 
     #                      Port, Center, Range,   Direction, Default value on Start (Proportional), Base (centered) angle, Max angle (The highest angle possible relative to the trigonometry package)
-    FRONT_BODY_LEFT:       [0,   370,    290,     -1,        0,                                     90,                    135]
-    FRONT_BODY_RIGHT:      [15,  370,    290,     1,         0,                                     90,                    135]
+    FRONT_BODY_LEFT:       [0,   430,    290,     -1,        0,                                     90,                    135]
+    FRONT_BODY_RIGHT:      [15,  260,    290,     1,         0,                                     90,                    135]
 
     FRONT_UPPER_LEG_LEFT:  [1,   270,    325,     1,         0,                                     35,                    155]
     FRONT_UPPER_LEG_RIGHT: [14,  395,    325,     -1,        0,                                     35,                    155]
@@ -17,8 +17,8 @@ smov_config:
     FRONT_LOWER_LEG_LEFT:  [2,   325,    440,      1,        -1,                                    115,                   190]
     FRONT_LOWER_LEG_RIGHT: [13,  395,    440,     -1,        -1,                                    115,                   190]
 
-    BACK_BODY_LEFT:        [15,  365,    290,     1,         0,                                     90,                    135]
-    BACK_BODY_RIGHT:       [0,   350,    290,     -1,        0,                                     90,                    135]
+    BACK_BODY_LEFT:        [15,  380,    290,     1,         0,                                     90,                    135]
+    BACK_BODY_RIGHT:       [0,   305,    290,     -1,        0,                                     90,                    135]
 
     BACK_UPPER_LEG_LEFT:   [14,  315,    325,     1,         0,                                     35,                    155]
     BACK_UPPER_LEG_RIGHT:  [1,   430,    325,     -1,        0,                                     35,                    155]
