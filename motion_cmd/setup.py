@@ -1,6 +1,5 @@
 from setuptools import setup
 from glob import glob
-import os
 
 package_name = 'motion_cmd'
 
@@ -13,19 +12,14 @@ data_files = [
 
 setup(
     name=package_name,
-    version='0.1.0',
-    packages=[package_name, package_name + '.gaits', package_name + '.utils'],
+    version='1.0.0',
+    packages=[package_name, package_name + '.gaits', package_name + '.utils', package_name + '.params'],
     data_files=data_files,
     install_requires=['setuptools'],
     zip_safe=False,
     maintainer='You',
     maintainer_email='you@example.com',
-    description='Spot-Micro-like motion commander (ROS 2, Python)',
+    description='ROS 2 Jazzy motion commander for Spot-Micro/SMOV; dual PCA9685; optional BNO085 IMU; independent of walking_gait.',
     license='MIT',
-    tests_require=['pytest'],
-    entry_points={
-        'console_scripts': [
-            'motion_cmd_node = motion_cmd.motion_cmd_node:main',
-        ],
-    },
+    entry_points={'console_scripts': ['motion_cmd_node = motion_cmd.motion_cmd_node:main']},
 )

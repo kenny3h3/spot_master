@@ -1,29 +1,24 @@
 <?xml version="1.0"?>
 <package format="3">
   <name>motion_cmd</name>
-  <version>0.1.0</version>
-  <description>Spot-Micro-like motion commander (ROS 2, Python). Independent of walking_gait, integrates with i2c_pwm_board and (optionally) SMOV packages.</description>
+  <version>1.0.0</version>
+  <description>ROS 2 Jazzy motion commander for Spot-Micro/SMOV; dual PCA9685; optional BNO085 IMU; no walking_gait.</description>
   <maintainer email="you@example.com">You</maintainer>
   <license>MIT</license>
 
-  <buildtool_depend>ament_cmake</buildtool_depend>
   <buildtool_depend>ament_python</buildtool_depend>
 
   <exec_depend>rclpy</exec_depend>
   <exec_depend>std_msgs</exec_depend>
   <exec_depend>geometry_msgs</exec_depend>
   <exec_depend>sensor_msgs</exec_depend>
-  
-  <!-- i2c_pwm_board messages for ServoArray -->
   <exec_depend>i2c_pwm_board_msgs</exec_depend>
 
-  <!-- Optional SMOV stack (kept as runtime deps so the package can live in the same workspace) -->
+  <!-- SMOV stack (optional at runtime) -->
   <exec_depend>smov_config</exec_depend>
   <exec_depend>smov_lib</exec_depend>
   <exec_depend>smov_states</exec_depend>
   <exec_depend>smov_msgs</exec_depend>
 
-  <export>
-    <build_type>ament_python</build_type>
-  </export>
+  <export><build_type>ament_python</build_type></export>
 </package>
