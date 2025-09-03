@@ -3,6 +3,7 @@
 #include <unistd.h>
 #include <fcntl.h>
 #include <optional>
+#include <string>
 
 namespace motion_cmd {
 
@@ -29,24 +30,26 @@ public:
     initialized_ = false;
   }
 
-  // Liest einen Key (falls vorhanden). Arrow-Keys liefern "UP","DOWN","LEFT","RIGHT".
-  // Buchstaben liefern ein einzelnes char (z.B. 'w','s',' ').
+  // Liest eine Taste (falls vorhanden).
+  // Arrow-Keys -> "UP","DOWN","LEFT","RIGHT", Buchstaben -> "w","s", etc.
   std::optional<std::string> readKey() {
     char c;
     if (read(STDIN_FILENO, &c, 1) != 1) return std::nullopt;
-    if (c == '\x1b') {         // ESC [ A/B/C/D
+    if (c == '\x1b') { // ESC [
       char seq[2];
       if (read(STDIN_FILENO, &seq[0], 1) != 1) return std::nullopt;
       if (read(STDIN_FILENO, &seq[1], 1) != 1) return std::nullopt;
       if (seq[0] == '[') {
-        if (seq[1] == 'A') return std::make_optional<std::string>("UP");
-        if (seq[1] == 'B') return std::make_optional<std::string>("DOWN");
-        if (seq[1] == 'C') return std::make_optional<std::string>("RIGHT");
-        if (seq[1] == 'D') return std::make_optional<std::string>("LEFT");
+        switch (seq[1]) {
+          case 'A': return std::make_optional(std::string("UP"));
+          case 'B': return std::make_optional(std::string("DOWN"));
+          case 'C': return std::make_optional(std::string("RIGHT"));
+          case 'D': return std::make_optional(std::string("LEFT"));
+        }
       }
       return std::nullopt;
     } else {
-      return std::make_optional<std::string>(1, c);
+      return std::make_optional(std::string(1, c));
     }
   }
 
@@ -56,3 +59,4 @@ private:
 };
 
 } // namespace motion_cmd
+
