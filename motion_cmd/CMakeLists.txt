@@ -19,7 +19,14 @@ add_executable(motion_cmd_node
   src/motion_cmd_node.cpp
   src/teleop_keys.cpp
 )
-ament_target_dependencies(motion_cmd_node rclcpp smov_lib smov_msgs)
+ament_target_dependencies(motion_cmd_node
+  rclcpp
+  smov_lib
+  smov_msgs
+  geometry_msgs
+  std_msgs
+)
+
 # Gegen die exportierte Bibliothek linken (smov_lib erzeugt libsmov_lib.so)
 target_link_libraries(motion_cmd_node smov_lib)
 
