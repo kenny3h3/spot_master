@@ -8,18 +8,18 @@ def generate_launch_description():
             executable='motion_cmd_node',
             name='motion_cmd',
             output='screen',
-            parameters=[
-                {'update_rate_hz': 100.0},
-                {'use_imu': True},
-                {'imu_topic': '/bno085/imu'},
-                {'output_mode': 'pwm'},
-                {'front_bus': 6},
-                {'back_bus': 4},
-                {'front_state_topic': '/smov/front_state'},
-                {'back_state_topic': '/smov/back_state'},
-                {'proportional_scale': 0.5},
-                {'channels_front': [0,1,2,3,4,5]},
-                {'channels_back':  [0,1,2,3,4,5]},
-            ]
-        )
+            parameters=[{
+                'update_rate_hz': 100.0,
+                'gait_frequency_hz': 1.8,
+                'step_height': 2.0,
+                'neutral_y': 6.0,
+                'neutral_x_front': 3.5,
+                'neutral_x_back': 3.7,
+                'max_stride_x': 2.0,
+                'max_stride_y': 2.0,
+                'upper_leg_length': 10.75,
+                'lower_leg_length': 13.0,
+                'hip_body_distance': 5.5,
+            }],
+        ),
     ])
