@@ -12,20 +12,17 @@ find_package(smov_msgs REQUIRED)
 find_package(geometry_msgs REQUIRED)
 find_package(std_msgs REQUIRED)
 
-include_directories(
-  ${CMAKE_CURRENT_SOURCE_DIR}/include
-  ${CMAKE_CURRENT_SOURCE_DIR}/../smov_lib/include
-)
+# Eigene Includes; smov_lib liefert sich via ament_export_include_directories
+include_directories(${CMAKE_CURRENT_SOURCE_DIR}/include)
 
-# Gait-Node (wie zuvor)
 add_executable(motion_cmd_node
   src/motion_cmd_node.cpp
   src/teleop_keys.cpp
 )
 ament_target_dependencies(motion_cmd_node rclcpp smov_lib smov_msgs)
-target_link_libraries(motion_cmd_node smov_lib)   # ggf. zu smov_lib::smov_lib ändern
+# Gegen die exportierte Bibliothek linken (smov_lib erzeugt libsmov_lib.so)
+target_link_libraries(motion_cmd_node smov_lib)
 
-# NEU: Tastatur-Teleop, publisht /cmd_vel, /walk_cmd, /idle_cmd
 add_executable(teleop_kb
   src/teleop_kb.cpp
   src/teleop_keys.cpp
