@@ -20,7 +20,7 @@ public:
     new_.c_cc[VTIME] = 0;
     if (tcsetattr(STDIN_FILENO, TCSANOW, &new_) < 0) return false;
     int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
-    fcntl(STDIN_FIL_FILENO, F_SETFL, flags | O_NONBLOCK);
+    fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);  // << Fix: STDIN_FILENO
     initialized_ = true;
     return true;
   }
@@ -58,3 +58,4 @@ private:
 };
 
 } // namespace motion_cmd
+
