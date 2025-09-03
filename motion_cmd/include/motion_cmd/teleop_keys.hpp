@@ -20,7 +20,7 @@ public:
     new_.c_cc[VTIME] = 0;
     if (tcsetattr(STDIN_FILENO, TCSANOW, &new_) < 0) return false;
     int flags = fcntl(STDIN_FILENO, F_GETFL, 0);
-    fcntl(STDIN_FILENO, F_SETFL, flags | O_NONBLOCK);
+    fcntl(STDIN_FIL_FILENO, F_SETFL, flags | O_NONBLOCK);
     initialized_ = true;
     return true;
   }
@@ -30,12 +30,11 @@ public:
     initialized_ = false;
   }
 
-  // Liest eine Taste (falls vorhanden).
-  // Arrow-Keys -> "UP","DOWN","LEFT","RIGHT", Buchstaben -> "w","s", etc.
+  // Arrow: "UP","DOWN","LEFT","RIGHT"; sonst 1-char string (z.B. "s"," ")
   std::optional<std::string> readKey() {
     char c;
     if (read(STDIN_FILENO, &c, 1) != 1) return std::nullopt;
-    if (c == '\x1b') { // ESC [
+    if (c == '\x1b') {
       char seq[2];
       if (read(STDIN_FILENO, &seq[0], 1) != 1) return std::nullopt;
       if (read(STDIN_FILENO, &seq[1], 1) != 1) return std::nullopt;
@@ -59,4 +58,3 @@ private:
 };
 
 } // namespace motion_cmd
-
