@@ -28,7 +28,7 @@ motion_cmd:
       max_stride: 0.08
 
     # Kanäle pro Board (je 6)
-    channels_front: [0,1,2,  3,4,5]
-    channels_back:  [0,1,2,  3,4,5]
+    channels_front: [0,1,2,  13,14,15]
+    channels_back:  [0,1,2,  13,14,15]
 
     proportional_scale: 0.5

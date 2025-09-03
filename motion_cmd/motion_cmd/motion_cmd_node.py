@@ -48,8 +48,8 @@ class MotionCmdNode(Node):
             ('front_state_topic', '/smov/front_state'),
             ('back_state_topic', '/smov/back_state'),
             ('proportional_scale', 0.5),
-            ('channels_front', [0,1,2,3,4,5]),
-            ('channels_back',  [0,1,2,3,4,5]),
+            ('channels_front', [0,1,2,13,14,15]),
+            ('channels_back',  [0,1,2,13,14,15]),
         ])
 
         self.state = State.IDLE
