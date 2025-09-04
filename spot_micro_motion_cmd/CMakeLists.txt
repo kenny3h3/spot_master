@@ -14,7 +14,7 @@ find_package(tf2_ros REQUIRED)
 find_package(tf2_geometry_msgs REQUIRED)
 find_package(i2cpwm_board_msgs REQUIRED)
 find_package(smov_msgs REQUIRED)
-find_package(smov_lib REQUIRED)  <!-- Ersetzt spot_micro_kinematics -->
+find_package(smov_lib REQUIRED)  # Nutzt smov_lib statt spot_micro_kinematics
 find_package(smov_config REQUIRED)
 
 include_directories(include)
@@ -32,7 +32,7 @@ ament_target_dependencies(spot_micro_motion_cmd_node
   tf2_geometry_msgs
   i2cpwm_board_msgs
   smov_msgs
-  smov_lib  <!-- Ersetzt spot_micro_kinematics -->
+  smov_lib  # Nutzt smov_lib
   smov_config
 )
 
@@ -55,7 +55,7 @@ ament_export_dependencies(
   tf2_geometry_msgs
   i2cpwm_board_msgs
   smov_msgs
-  smov_lib  <!-- Ersetzt spot_micro_kinematics -->
+  smov_lib  # Nutzt smov_lib
   smov_config
 )
 
