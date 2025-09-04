@@ -1,4 +1,3 @@
-// motion_control.h
 #pragma once
 
 #include <math.h>
@@ -43,7 +42,7 @@ class MotionControl {
   float neutral_x_back = 3.7f;
  
   Mode mode = SITTING_DOWN;
-  Mode pending_mode;
+  Mode pending_mode = STANDING;
   bool has_pending = false;
   smov::TrigonometryState trig = smov::TrigonometryState(&front_servos, &back_servos, &front_state_publisher, &back_state_publisher, &upper_leg_length, &lower_leg_length, &hip_body_distance);
   smov::Vector3 coord1, coord2, coord3, coord4;

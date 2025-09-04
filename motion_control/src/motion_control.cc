@@ -1,4 +1,3 @@
-// motion_control.cc
 #include "motion_control/motion_control.h"
 
 float MotionControl::curved(float x, float dist_from_origin, float gap) {
@@ -27,7 +26,7 @@ void MotionControl::stabilize_legs() {
   trig.set_leg_to(3, coord3);
   trig.set_leg_to(4, coord4);
 
-  RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Set default position to ((x≈%.2f/%.2f, y≈%.2f, z=5)", neutral_x_front, neutral_x_back, neutral_y);
+  RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Set default position to (x≈%.2f/%.2f, y≈%.2f, z=5)", neutral_x_front, neutral_x_back, neutral_y);
 }
 
 void MotionControl::output_coordinates() {
@@ -62,6 +61,7 @@ void MotionControl::output_coordinates() {
   RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Motion done leg 2: %d", leg2_motion_done);
   RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Motion done leg 3: %d", leg3_motion_done);
   RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Motion done leg 4: %d", leg4_motion_done);
+  RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Pending mode: %d, Has pending: %d", pending_mode, has_pending);
 }
 
 void MotionControl::walk() {
@@ -316,45 +316,57 @@ void MotionControl::wake_up() {
 }
 
 void MotionControl::on_start() {
-  tcgetattr(0, &old_chars);
-  fcntl(0, F_SETFL, O_NONBLOCK);
+  tcgetattr(STDIN_FILENO, &old_chars);
   new_chars = old_chars;
-  new_chars.c_lflag &= ~ICANON;
-  new_chars.c_lflag &= 0 ? ECHO : ~ECHO;
-  tcsetattr(0, TCSANOW, &new_chars);
+  new_chars.c_lflag &= ~(ICANON | ECHO); // Disable canonical mode and echo
+  new_chars.c_cc[VMIN] = 0;  // Non-blocking read, return immediately
+  new_chars.c_cc[VTIME] = 0;
+  tcsetattr(STDIN_FILENO, TCSANOW, &new_chars);
+  fcntl(STDIN_FILENO, F_SETFL, O_NONBLOCK);
+  RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Terminal initialized for non-blocking input.");
 }
 
 void MotionControl::on_loop() {
   bool up_pressed = false, left_pressed = false, right_pressed = false;
-  int c;
-  while ((c = getchar()) != -1) {
-    switch (c) {
-      case 65: // Up arrow
-        up_pressed = true;
-        break;
-      case 67: // Right arrow
-        right_pressed = true;
-        break;
-      case 68: // Left arrow
-        left_pressed = true;
-        break;
-      case 'w':
-      case 'W':
+  char buf[3];
+  int n;
+
+  // Read all available input
+  while ((n = read(STDIN_FILENO, buf, sizeof(buf))) > 0) {
+    for (int i = 0; i < n; i++) {
+      if (buf[i] == 27 && i + 2 < n && buf[i + 1] == '[') { // Escape sequence for arrow keys
+        i += 2;
+        switch (buf[i]) {
+          case 'A': // Up arrow
+            up_pressed = true;
+            RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Up arrow detected");
+            break;
+          case 'C': // Right arrow
+            right_pressed = true;
+            RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Right arrow detected");
+            break;
+          case 'D': // Left arrow
+            left_pressed = true;
+            RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Left arrow detected");
+            break;
+        }
+      } else if (buf[i] == 'w' || buf[i] == 'W') {
+        RCLCPP_INFO(rclcpp::get_logger("motion_control"), "W key detected");
         if (mode == SITTING_DOWN) {
           mode = WAKING_UP;
           wake_up();
         }
-        break;
-      case 's':
-      case 'S':
+      } else if (buf[i] == 's' || buf[i] == 'S') {
+        RCLCPP_INFO(rclcpp::get_logger("motion_control"), "S key detected");
         if (mode != SITTING_DOWN) {
           request_to_stop_walk = true;
           has_pending = false;
         }
-        break;
+      }
     }
   }
 
+  // Determine desired mode based on input
   Mode desired_mode = STANDING;
   if (mode != SITTING_DOWN && mode != WAKING_UP) {
     if (up_pressed && left_pressed && !right_pressed) {
@@ -370,7 +382,9 @@ void MotionControl::on_loop() {
     }
   }
 
+  // Queue new mode if different from current
   if (desired_mode != STANDING && desired_mode != mode) {
+    RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Queueing new mode: %d", desired_mode);
     pending_mode = desired_mode;
     has_pending = true;
     request_to_stop_walk = true;
@@ -378,13 +392,22 @@ void MotionControl::on_loop() {
 
   output_coordinates();
 
+  // Check if current motion is complete
   if (smov::Functions::approx(coord1.x, 3.5f, 0.06f) && smov::Functions::approx(coord2.x, 3.5f, 0.06f) 
     && smov::Functions::approx(coord3.x, 3.5f, 0.06f) && smov::Functions::approx(coord4.x, 3.5f, 0.06f) && request_to_stop_walk) {
     has_finished_walk = true;
-    if (mode == STANDING) done_once = false;
-  } else 
+  } else {
     has_finished_walk = false;
+  }
 
+  if (smov::Functions::approx(coord1.z, 5.0f, 0.06f) && smov::Functions::approx(coord2.z, 5.0f, 0.06f) 
+    && smov::Functions::approx(coord3.z, 5.0f, 0.06f) && smov::Functions::approx(coord4.z, 5.0f, 0.06f) && request_to_stop_walk) {
+    has_finished_turn = true;
+  } else {
+    has_finished_turn = false;
+  }
+
+  // Execute current mode
   if (mode == WALKING) {
     if (done_once == false) {
       leg1_motion_done = false;
@@ -392,36 +415,28 @@ void MotionControl::on_loop() {
       done_once = true;
     }
     walk();
-  }
-
-  if (mode == CURVING_LEFT) {
+  } else if (mode == CURVING_LEFT) {
     if (done_once == false) {
       leg1_motion_done = false;
       leg4_motion_done = false;
       done_once = true;
     }
     curve(true);
-  }
-
-  if (mode == CURVING_RIGHT) {
+  } else if (mode == CURVING_RIGHT) {
     if (done_once == false) {
       leg1_motion_done = false;
       leg4_motion_done = false;
       done_once = true;
     }
     curve(false);
-  }
-
-  if (mode == TURNING_RIGHT) {
+  } else if (mode == TURNING_RIGHT) {
     if (done_once == false) {
       leg1_motion_done = false;
       leg4_motion_done = false;
       done_once = true;
     }
     turn();
-  }
-
-  if (mode == TURNING_LEFT) {
+  } else if (mode == TURNING_LEFT) {
     if (done_once == false) {
       leg2_motion_done = false;
       leg3_motion_done = false;
@@ -430,22 +445,15 @@ void MotionControl::on_loop() {
     turn();
   }
 
-  if (smov::Functions::approx(coord1.z, 5.0f, 0.06f) && smov::Functions::approx(coord2.z, 5.0f, 0.06f) 
-    && smov::Functions::approx(coord3.z, 5.0f, 0.06f) && smov::Functions::approx(coord4.z, 5.0f, 0.06f) && request_to_stop_walk) {
-    has_finished_turn = true;
-    if (mode == STANDING) done_once = false;
-  } else 
-    has_finished_turn = false;
-
-  if (smov::Functions::approx(coord1.z, 5.0f, 0.06f) && smov::Functions::approx(coord2.z, 5.0f, 0.06f) && 
-      smov::Functions::approx(coord3.z, 5.0f, 0.06f) && smov::Functions::approx(coord4.z, 5.0f, 0.06f) && 
-      smov::Functions::approx(coord1.x, 3.5f, 0.06f) && smov::Functions::approx(coord2.x, 3.5f, 0.06f) && 
-      smov::Functions::approx(coord3.x, 3.5f, 0.06f) && smov::Functions::approx(coord4.x, 3.5f, 0.06f) && 
-      request_to_stop_walk) {
+  // Transition to pending mode when current motion is complete
+  if (has_finished_walk && has_finished_turn && request_to_stop_walk) {
     mode = STANDING;
+    done_once = false;
     if (has_pending) {
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Switching to pending mode: %d", pending_mode);
       mode = pending_mode;
       has_pending = false;
+      request_to_stop_walk = false;
       done_once = false;
     }
   }
@@ -453,6 +461,7 @@ void MotionControl::on_loop() {
 
 void MotionControl::on_quit() {
   tcsetattr(STDIN_FILENO, TCSANOW, &old_chars);
+  RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Restored terminal settings.");
 }
 
 DECLARE_STATE_NODE_CLASS("motion_control", MotionControl, 15ms)
