@@ -2,7 +2,7 @@
 <package format="3">
   <name>motion_cmd</name>
   <version>1.0.0</version>
-  <description>Keyboard-driven gait using SMOV TrigonometryState; W/S + arrow keys; independent of walking_gait.</description>
+  <description>Keyboard + /cmd_vel driven gait using SMOV TrigonometryState; W=Wake→Walk, S=Idle, arrows for steer/curve.</description>
   <maintainer email="you@example.com">You</maintainer>
   <license>MIT</license>
 
@@ -11,6 +11,8 @@
   <depend>rclcpp</depend>
   <depend>smov_lib</depend>
   <depend>smov_msgs</depend>
+  <depend>geometry_msgs</depend>
+  <depend>std_msgs</depend>
 
   <export>
     <build_type>ament_cmake</build_type>

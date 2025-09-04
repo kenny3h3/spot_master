@@ -1,3 +1,4 @@
+// motion_control.h
 #pragma once
 
 #include <math.h>
@@ -20,7 +21,8 @@ enum Mode {
   WALKING = 3,
   TURNING_RIGHT = 4,
   TURNING_LEFT = 5,
-  BACKWARDS = 6
+  CURVING_LEFT = 6,
+  CURVING_RIGHT = 7
 };
 
 class MotionControl {
@@ -31,16 +33,18 @@ class MotionControl {
   void stabilize_legs();
   void output_coordinates();
   void walk();
-  void backwards();
   void turn();
+  void curve(bool is_left);
   void wake_up();
 
   float back_leg_gap = 0.0f;
   float neutral_y = 22.5f;
   float neutral_x_front = 3.5f;
   float neutral_x_back = 3.7f;
-
+ 
   Mode mode = SITTING_DOWN;
+  Mode pending_mode;
+  bool has_pending = false;
   smov::TrigonometryState trig = smov::TrigonometryState(&front_servos, &back_servos, &front_state_publisher, &back_state_publisher, &upper_leg_length, &lower_leg_length, &hip_body_distance);
   smov::Vector3 coord1, coord2, coord3, coord4;
   bool leg1_motion_done = true, leg2_motion_done = true, leg3_motion_done = true, leg4_motion_done = true;

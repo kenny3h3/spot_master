@@ -16,11 +16,13 @@ def generate_launch_description():
                 'neutral_x_front': 3.5,
                 'neutral_x_back': 3.7,
                 'max_stride_x': 2.0,
-                'max_stride_y': 2.0,
+                'max_turn': 1.0,
+                'wake_duration': 2.5,
+                'wake_start_z': 2.5,
+                'wake_end_z': 5.0,
                 'upper_leg_length': 10.75,
                 'lower_leg_length': 13.0,
                 'hip_body_distance': 5.5,
             }],
         ),
     ])
-

@@ -8,7 +8,6 @@
 #include <geometry_msgs/msg/twist.hpp>
 #include "smov_msgs/msg/states_servos.hpp"
 
-// SMOV IK
 #include "smov/trigonometry.h"
 #include "smov/mathematics.h"
 
@@ -16,7 +15,10 @@
 
 using namespace std::chrono_literals;
 
-namespace { inline float clampf(float v, float lo, float hi){ return std::max(lo, std::min(hi, v)); } inline double smoothstep(double t){ return t*t*(3-2*t); } }
+namespace {
+inline float clampf(float v, float lo, float hi){ return std::max(lo, std::min(hi, v)); }
+inline double smoothstep(double t){ return t*t*(3-2*t); }
+}
 
 class MotionCmdNode : public rclcpp::Node {
 public:
@@ -31,42 +33,41 @@ public:
     max_stride_x_     = declare_parameter<double>("max_stride_x",   2.0);
     max_turn_         = declare_parameter<double>("max_turn",       1.0);
 
-    // Wake-up Sequenz
-    wake_duration_    = declare_parameter<double>("wake_duration", 2.5); // s
+    // Wake
+    wake_duration_    = declare_parameter<double>("wake_duration", 2.5);
     wake_start_z_     = declare_parameter<double>("wake_start_z",  2.5);
     wake_end_z_       = declare_parameter<double>("wake_end_z",    5.0);
 
-    // IK-Geometrie
-    upper_leg_length_  = declare_parameter<double>("upper_leg_length", 10.75);
-    lower_leg_length_  = declare_parameter<double>("lower_leg_length", 13.0);
-    hip_body_distance_ = declare_parameter<double>("hip_body_distance", 5.5);
-
-    // Publisher
+    // IK + Publisher
     front_pub_ = this->create_publisher<smov_msgs::msg::StatesServos>("front_proportional_servos", 10);
     back_pub_  = this->create_publisher<smov_msgs::msg::StatesServos>("back_proportional_servos", 10);
     front_servos_.state_name = "MOTION_CMD";
     back_servos_.state_name  = "MOTION_CMD";
 
-    // IK
     trig_ = std::make_unique<smov::TrigonometryState>(
       &front_servos_, &back_servos_, &front_pub_, &back_pub_,
       &upper_leg_length_, &lower_leg_length_, &hip_body_distance_
     );
+    // IK-Geometrie – bei dir kommen die Längen aus dem SMOV-Stack/Konfig;
+    // hier nur Defaultwerte (werden von deiner Kette sowieso kalibriert):
+    upper_leg_length_  = declare_parameter<double>("upper_leg_length", 10.75);
+    lower_leg_length_  = declare_parameter<double>("lower_leg_length", 13.0);
+    hip_body_distance_ = declare_parameter<double>("hip_body_distance", 5.5);
 
     // Tastatur optional
     if (!keys_.init()) {
-      RCLCPP_WARN(get_logger(), "Kein Terminal-Rawmode: Steuerung per /cmd_vel, /walk_cmd, /idle_cmd empfohlen.");
+      RCLCPP_WARN(get_logger(), "Kein TTY-Rawmode: steuerbar via /cmd_vel, /walk_cmd, /idle_cmd.");
     } else {
-      RCLCPP_INFO(get_logger(), "Tasten: W=Aufwachen+Gehen, S=Stop, Pfeile: vor/zurück & drehen.");
+      RCLCPP_INFO(get_logger(), "Keymap: W=Wake→Walk, S=Idle, ↑/↓ vor/rück, ←/→ drehen, (↑+←/→) Kurve.");
     }
 
     // Topic-Steuerung
     cmd_vel_sub_ = this->create_subscription<geometry_msgs::msg::Twist>(
       "/cmd_vel", 10,
       [this](const geometry_msgs::msg::Twist::SharedPtr msg){
-        vx_ = clampf(float(msg->linear.x), -1.0f, 1.0f) * base_speed_x_;
-        wz_ = clampf(float(msg->angular.z), -1.0f, 1.0f) * base_turn_;
-        if (mode_ == Mode::IDLE && (std::fabs(vx_) > 1e-3f || std::fabs(wz_) > 1e-3f)) startWake();
+        vx_ = clampf((float)msg->linear.x, -1.0f, 1.0f) * base_speed_x_;
+        wz_ = clampf((float)msg->angular.z, -1.0f, 1.0f) * base_turn_;
+        if (mode_ == Mode::IDLE && (std::fabs(vx_)>1e-3f || std::fabs(wz_)>1e-3f)) startWake();
       });
 
     walk_sub_ = this->create_subscription<std_msgs::msg::Bool>(
@@ -78,7 +79,7 @@ public:
     const double dt = 1.0 / update_rate_hz_;
     timer_ = this->create_wall_timer(std::chrono::duration<double>(dt), std::bind(&MotionCmdNode::loop, this));
 
-    RCLCPP_INFO(get_logger(), "motion_cmd: IDLE bereit.");
+    RCLCPP_INFO(get_logger(), "motion_cmd bereit (IDLE).");
   }
 
   ~MotionCmdNode() override { keys_.shutdown(); }
@@ -87,9 +88,9 @@ private:
   enum class Mode { IDLE, WAKE, WALK };
   Mode mode_{Mode::IDLE};
 
-  // Steuerzustand
+  // Zustand
   double phase_{0.0};
-  float vx_{0.0f}; // vor/zurück
+  float vx_{0.0f}; // vor/rück
   float wz_{0.0f}; // drehen
   const float base_speed_x_ = 0.8f;
   const float base_turn_    = 0.6f;
@@ -111,35 +112,24 @@ private:
   rclcpp::Subscription<std_msgs::msg::Bool>::SharedPtr walk_sub_, idle_sub_;
   rclcpp::TimerBase::SharedPtr timer_;
   motion_cmd::TeleopKeys keys_;
-
-  // Wake intern
   double wake_t_{0.0};
 
-  // Hilfsfunktionen
+  // Hilfen
   float swing_z(double ph) const {
-    if (ph < 0.5) return float(wake_end_z_);          // stance auf Standhöhe
+    if (ph < 0.5) return float(wake_end_z_);
     double t = (ph - 0.5) / 0.5;
     return float(wake_end_z_) + float(step_height_) * float(std::sin(M_PI * t));
   }
-
   float step_x(double neutral_x, double ph, double stride) const {
-    if (ph < 0.5) { double t = ph / 0.5; return float(neutral_x - stride * (1.0 - t)); }
+    if (ph < 0.5) { double t = ph / 0.5;       return float(neutral_x - stride * (1.0 - t)); }
     else          { double t = (ph - 0.5) / 0.5; return float(neutral_x + stride * t); }
   }
 
   void startWake() {
-    if (mode_ == Mode::IDLE) {
-      mode_ = Mode::WAKE; wake_t_ = 0.0;
-      RCLCPP_INFO(get_logger(), "Wake-Up gestartet …");
-    } else if (mode_ == Mode::WALK) {
-      // schon wach: einfach weiter
-    } else {
-      // WAKE läuft schon
-    }
+    if (mode_ == Mode::IDLE) { mode_ = Mode::WAKE; wake_t_ = 0.0; RCLCPP_INFO(get_logger(), "WAKE…"); }
   }
   void goIdle() {
     mode_ = Mode::IDLE; vx_ = 0.0f; wz_ = 0.0f; phase_ = 0.0;
-    // neutrale Pose
     smov::Vector3 fl{float(neutral_x_front_), float(neutral_y_), float(wake_end_z_)};
     smov::Vector3 fr{float(neutral_x_front_), float(neutral_y_), float(wake_end_z_)};
     smov::Vector3 bl{float(neutral_x_back_),  float(neutral_y_), float(wake_end_z_)};
@@ -159,8 +149,8 @@ private:
     } else {
       if (k=="UP")    vx_ =  base_speed_x_;
       if (k=="DOWN")  vx_ = -base_speed_x_;
-      if (k=="LEFT")  wz_ =  base_turn_;   // links drehen
-      if (k=="RIGHT") wz_ = -base_turn_;   // rechts drehen
+      if (k=="LEFT")  wz_ =  base_turn_;
+      if (k=="RIGHT") wz_ = -base_turn_;
     }
   }
 
@@ -170,28 +160,20 @@ private:
     const double dt = 1.0 / update_rate_hz_;
 
     if (mode_ == Mode::WAKE) {
-      // sanft von (x_neutral, y_neutral, wake_start_z) nach (… , wake_end_z)
       wake_t_ += dt;
       double u = std::min(1.0, wake_t_ / wake_duration_);
       double s = smoothstep(u);
-
       const float z = float(wake_start_z_ + (wake_end_z_ - wake_start_z_) * s);
-
       smov::Vector3 fl{float(neutral_x_front_), float(neutral_y_), z};
       smov::Vector3 fr{float(neutral_x_front_), float(neutral_y_), z};
       smov::Vector3 bl{float(neutral_x_back_),  float(neutral_y_), z};
       smov::Vector3 br{float(neutral_x_back_),  float(neutral_y_), z};
       trig_->set_leg_to(1, fl); trig_->set_leg_to(2, fr); trig_->set_leg_to(3, bl); trig_->set_leg_to(4, br);
-
-      if (u >= 1.0) {
-        mode_ = Mode::WALK;
-        RCLCPP_INFO(get_logger(), "Wake-Up fertig → WALK.");
-      }
-      return; // in WAKE keine Schrittphase
+      if (u >= 1.0) { mode_ = Mode::WALK; RCLCPP_INFO(get_logger(), "WALK."); }
+      return;
     }
 
     if (mode_ == Mode::IDLE) {
-      // stehende Pose halten
       smov::Vector3 fl{float(neutral_x_front_), float(neutral_y_), float(wake_end_z_)};
       smov::Vector3 fr{float(neutral_x_front_), float(neutral_y_), float(wake_end_z_)};
       smov::Vector3 bl{float(neutral_x_back_),  float(neutral_y_), float(wake_end_z_)};
@@ -200,7 +182,7 @@ private:
       return;
     }
 
-    // WALK
+    // WALK (Trot, turn = in-place Rotation; kombiniert mit vx => Kurve)
     phase_ += dt * gait_freq_hz_;
     if (phase_ >= 1.0) phase_ -= 1.0;
 
@@ -209,19 +191,19 @@ private:
     const double stride_x = clampf(vx_, -float(max_stride_x_), float(max_stride_x_));
     const double turn     = clampf(wz_, -float(max_turn_),     float(max_turn_));
 
+    // Dreh-Differential in X: linke Beine +turn, rechte -turn
+    const double s_fl = stride_x + turn;
+    const double s_fr = stride_x - turn;
+    const double s_bl = stride_x + turn;
+    const double s_br = stride_x - turn;
+
     smov::Vector3 fl, fr, bl, br;
-    // Dreh-Differential in X (links+, rechts-)
-    const double stride_fl = stride_x + turn;
-    const double stride_fr = stride_x - turn;
-    const double stride_bl = stride_x + turn;
-    const double stride_br = stride_x - turn;
+    fl.x = step_x(neutral_x_front_, ph0, s_fl); fl.y = float(neutral_y_); fl.z = swing_z(ph0);
+    br.x = step_x(neutral_x_back_,  ph0, s_br); br.y = float(neutral_y_); br.z = swing_z(ph0);
+    fr.x = step_x(neutral_x_front_, ph1, s_fr); fr.y = float(neutral_y_); fr.z = swing_z(ph1);
+    bl.x = step_x(neutral_x_back_,  ph1, s_bl); bl.y = float(neutral_y_); bl.z = swing_z(ph1);
 
-    fl.x = step_x(neutral_x_front_, ph0, stride_fl); fl.y = float(neutral_y_); fl.z = swing_z(ph0);
-    br.x = step_x(neutral_x_back_,  ph0, stride_br); br.y = float(neutral_y_); br.z = swing_z(ph0);
-
-    fr.x = step_x(neutral_x_front_, ph1, stride_fr); fr.y = float(neutral_y_); fr.z = swing_z(ph1);
-    bl.x = step_x(neutral_x_back_,  ph1, stride_bl); bl.y = float(neutral_y_); bl.z = swing_z(ph1);
-
+    // Leg IDs: 1=FL, 2=FR, 3=BL, 4=BR
     trig_->set_leg_to(1, fl);
     trig_->set_leg_to(2, fr);
     trig_->set_leg_to(3, bl);
