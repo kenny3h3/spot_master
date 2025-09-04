@@ -65,11 +65,13 @@ void MotionControl::output_coordinates() {
 }
 
 void MotionControl::walk() {
+  RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Executing walk()");
   if (!leg1_motion_done) {
     if (coord1.x > -1.45f) {
       coord1.x = smov::Functions::lerp(coord1.x, -1.5f, 0.15f);
       coord1.y = curved(coord1.x, 2.0f, 0.0f);
       trig.set_leg_to(1, coord1);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 1 moving to (%f, %f, %f)", coord1.x, coord1.y, coord1.z);
     } else {
       leg1_motion_done = true;
       if (!request_to_stop_walk) leg2_motion_done = false;
@@ -78,6 +80,7 @@ void MotionControl::walk() {
     if (coord1.x < 3.45f) {
       coord1.x = smov::Functions::lerp(coord1.x, 3.5f, 0.15f);
       trig.set_leg_to(1, coord1);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 1 returning to (%f, %f, %f)", coord1.x, coord1.y, coord1.z);
     }
   }
 
@@ -86,6 +89,7 @@ void MotionControl::walk() {
       coord4.x = smov::Functions::lerp(coord4.x, -1.5f, 0.15f);
       coord4.y = curved(coord4.x, 2.0f, back_leg_gap);
       trig.set_leg_to(4, coord4);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 4 moving to (%f, %f, %f)", coord4.x, coord4.y, coord4.z);
     } else {
       leg4_motion_done = true;
       if (!request_to_stop_walk) leg3_motion_done = false;
@@ -94,6 +98,7 @@ void MotionControl::walk() {
     if (coord4.x < 3.45f) {
       coord4.x = smov::Functions::lerp(coord4.x, 3.5f, 0.15f);
       trig.set_leg_to(4, coord4);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 4 returning to (%f, %f, %f)", coord4.x, coord4.y, coord4.z);
     }
   }
 
@@ -102,6 +107,7 @@ void MotionControl::walk() {
       coord2.x = smov::Functions::lerp(coord2.x, -1.5f, 0.15f);
       coord2.y = curved(coord2.x, 2.0f, 0.0f);
       trig.set_leg_to(2, coord2);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 2 moving to (%f, %f, %f)", coord2.x, coord2.y, coord2.z);
     } else {
       leg2_motion_done = true;
       if (!request_to_stop_walk) leg1_motion_done = false;
@@ -110,6 +116,7 @@ void MotionControl::walk() {
     if (coord2.x < 3.45f) {
       coord2.x = smov::Functions::lerp(coord2.x, 3.5f, 0.15f);
       trig.set_leg_to(2, coord2);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 2 returning to (%f, %f, %f)", coord2.x, coord2.y, coord2.z);
     }
   }
 
@@ -118,6 +125,7 @@ void MotionControl::walk() {
       coord3.x = smov::Functions::lerp(coord3.x, -1.5f, 0.15f);
       coord3.y = curved(coord3.x, 2.0f, back_leg_gap);
       trig.set_leg_to(3, coord3);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 3 moving to (%f, %f, %f)", coord3.x, coord3.y, coord3.z);
     } else {
       leg3_motion_done = true;
       if (!request_to_stop_walk) leg4_motion_done = false;
@@ -126,11 +134,13 @@ void MotionControl::walk() {
     if (coord3.x < 3.45f) {
       coord3.x = smov::Functions::lerp(coord3.x, 3.5f, 0.15f);
       trig.set_leg_to(3, coord3);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 3 returning to (%f, %f, %f)", coord3.x, coord3.y, coord3.z);
     }
   }
 }
 
 void MotionControl::curve(bool is_left) {
+  RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Executing curve(%d)", is_left);
   float z_target = is_left ? 7.0f : 3.0f;
   float z_return = 5.0f;
 
@@ -140,6 +150,7 @@ void MotionControl::curve(bool is_left) {
       coord1.y = curved(coord1.x, 2.0f, 0.0f);
       coord1.z = smov::Functions::lerp(coord1.z, z_target, 0.1f);
       trig.set_leg_to(1, coord1);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 1 moving to (%f, %f, %f)", coord1.x, coord1.y, coord1.z);
     } else {
       leg1_motion_done = true;
       if (!request_to_stop_walk) leg2_motion_done = false;
@@ -149,6 +160,7 @@ void MotionControl::curve(bool is_left) {
       coord1.x = smov::Functions::lerp(coord1.x, 3.5f, 0.15f);
       coord1.z = smov::Functions::lerp(coord1.z, z_return, 0.1f);
       trig.set_leg_to(1, coord1);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 1 returning to (%f, %f, %f)", coord1.x, coord1.y, coord1.z);
     }
   }
 
@@ -158,6 +170,7 @@ void MotionControl::curve(bool is_left) {
       coord4.y = curved(coord4.x, 2.0f, back_leg_gap);
       coord4.z = smov::Functions::lerp(coord4.z, z_target, 0.1f);
       trig.set_leg_to(4, coord4);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 4 moving to (%f, %f, %f)", coord4.x, coord4.y, coord4.z);
     } else {
       leg4_motion_done = true;
       if (!request_to_stop_walk) leg3_motion_done = false;
@@ -167,6 +180,7 @@ void MotionControl::curve(bool is_left) {
       coord4.x = smov::Functions::lerp(coord4.x, 3.5f, 0.15f);
       coord4.z = smov::Functions::lerp(coord4.z, z_return, 0.1f);
       trig.set_leg_to(4, coord4);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 4 returning to (%f, %f, %f)", coord4.x, coord4.y, coord4.z);
     }
   }
 
@@ -176,6 +190,7 @@ void MotionControl::curve(bool is_left) {
       coord2.y = curved(coord2.x, 2.0f, 0.0f);
       coord2.z = smov::Functions::lerp(coord2.z, z_target, 0.1f);
       trig.set_leg_to(2, coord2);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 2 moving to (%f, %f, %f)", coord2.x, coord2.y, coord2.z);
     } else {
       leg2_motion_done = true;
       if (!request_to_stop_walk) leg1_motion_done = false;
@@ -185,6 +200,7 @@ void MotionControl::curve(bool is_left) {
       coord2.x = smov::Functions::lerp(coord2.x, 3.5f, 0.15f);
       coord2.z = smov::Functions::lerp(coord2.z, z_return, 0.1f);
       trig.set_leg_to(2, coord2);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 2 returning to (%f, %f, %f)", coord2.x, coord2.y, coord2.z);
     }
   }
 
@@ -194,6 +210,7 @@ void MotionControl::curve(bool is_left) {
       coord3.y = curved(coord3.x, 2.0f, back_leg_gap);
       coord3.z = smov::Functions::lerp(coord3.z, z_target, 0.1f);
       trig.set_leg_to(3, coord3);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 3 moving to (%f, %f, %f)", coord3.x, coord3.y, coord3.z);
     } else {
       leg3_motion_done = true;
       if (!request_to_stop_walk) leg4_motion_done = false;
@@ -203,16 +220,19 @@ void MotionControl::curve(bool is_left) {
       coord3.x = smov::Functions::lerp(coord3.x, 3.5f, 0.15f);
       coord3.z = smov::Functions::lerp(coord3.z, z_return, 0.1f);
       trig.set_leg_to(3, coord3);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 3 returning to (%f, %f, %f)", coord3.x, coord3.y, coord3.z);
     }
   }
 }
 
 void MotionControl::turn() {
+  RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Executing turn()");
   if (!leg1_motion_done) {
     if (coord1.z < 9.95f) {
       coord1.z = smov::Functions::lerp(coord1.z, 10.0f, 0.15f);
       coord1.y = curved(coord1.z, 15.0f, 0.0f);
       trig.set_leg_to(1, coord1);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 1 moving to (%f, %f, %f)", coord1.x, coord1.y, coord1.z);
     } else {
       leg1_motion_done = true;
       if (!request_to_stop_walk) leg2_motion_done = false;
@@ -221,6 +241,7 @@ void MotionControl::turn() {
     if (coord1.z > 4.95f) {
       coord1.z = smov::Functions::lerp(coord1.z, 5.0f, 0.15f);
       trig.set_leg_to(1, coord1);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 1 returning to (%f, %f, %f)", coord1.x, coord1.y, coord1.z);
     }
   }
 
@@ -229,6 +250,7 @@ void MotionControl::turn() {
       coord4.z = smov::Functions::lerp(coord4.z, 10.0f, 0.15f);
       coord4.y = curved(coord4.z, 15.0f, back_leg_gap);
       trig.set_leg_to(4, coord4);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 4 moving to (%f, %f, %f)", coord4.x, coord4.y, coord4.z);
     } else {
       leg4_motion_done = true;
       if (!request_to_stop_walk) leg3_motion_done = false;
@@ -237,6 +259,7 @@ void MotionControl::turn() {
     if (coord4.z > 4.95f) {
       coord4.z = smov::Functions::lerp(coord4.z, 5.0f, 0.15f);
       trig.set_leg_to(4, coord4);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 4 returning to (%f, %f, %f)", coord4.x, coord4.y, coord4.z);
     }
   }
 
@@ -245,6 +268,7 @@ void MotionControl::turn() {
       coord2.z = smov::Functions::lerp(coord2.z, 10.0f, 0.15f);
       coord2.y = curved(coord2.z, 15.0f, 0.0f);
       trig.set_leg_to(2, coord2);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 2 moving to (%f, %f, %f)", coord2.x, coord2.y, coord2.z);
     } else {
       leg2_motion_done = true;
       if (!request_to_stop_walk) leg1_motion_done = false;
@@ -253,6 +277,7 @@ void MotionControl::turn() {
     if (coord2.z > 4.95f) {
       coord2.z = smov::Functions::lerp(coord2.z, 5.0f, 0.15f);
       trig.set_leg_to(2, coord2);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 2 returning to (%f, %f, %f)", coord2.x, coord2.y, coord2.z);
     }
   }
 
@@ -261,6 +286,7 @@ void MotionControl::turn() {
       coord3.z = smov::Functions::lerp(coord3.z, 10.0f, 0.15f);
       coord3.y = curved(coord3.z, 15.0f, back_leg_gap);
       trig.set_leg_to(3, coord3);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 3 moving to (%f, %f, %f)", coord3.x, coord3.y, coord3.z);
     } else {
       leg3_motion_done = true;
       if (!request_to_stop_walk) leg4_motion_done = false;
@@ -269,6 +295,7 @@ void MotionControl::turn() {
     if (coord3.z > 4.95f) {
       coord3.z = smov::Functions::lerp(coord3.z, 5.0f, 0.15f);
       trig.set_leg_to(3, coord3);
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 3 returning to (%f, %f, %f)", coord3.x, coord3.y, coord3.z);
     }
   }
 }
@@ -413,6 +440,7 @@ void MotionControl::on_loop() {
       leg1_motion_done = false;
       leg4_motion_done = false;
       done_once = true;
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Starting WALKING cycle");
     }
     walk();
   } else if (mode == CURVING_LEFT) {
@@ -420,6 +448,7 @@ void MotionControl::on_loop() {
       leg1_motion_done = false;
       leg4_motion_done = false;
       done_once = true;
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Starting CURVING_LEFT cycle");
     }
     curve(true);
   } else if (mode == CURVING_RIGHT) {
@@ -427,6 +456,7 @@ void MotionControl::on_loop() {
       leg1_motion_done = false;
       leg4_motion_done = false;
       done_once = true;
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Starting CURVING_RIGHT cycle");
     }
     curve(false);
   } else if (mode == TURNING_RIGHT) {
@@ -434,6 +464,7 @@ void MotionControl::on_loop() {
       leg1_motion_done = false;
       leg4_motion_done = false;
       done_once = true;
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Starting TURNING_RIGHT cycle");
     }
     turn();
   } else if (mode == TURNING_LEFT) {
@@ -441,6 +472,7 @@ void MotionControl::on_loop() {
       leg2_motion_done = false;
       leg3_motion_done = false;
       done_once = true;
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Starting TURNING_LEFT cycle");
     }
     turn();
   }
