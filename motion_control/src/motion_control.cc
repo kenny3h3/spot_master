@@ -62,6 +62,7 @@ void MotionControl::output_coordinates() {
   RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Motion done leg 3: %d", leg3_motion_done);
   RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Motion done leg 4: %d", leg4_motion_done);
   RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Pending mode: %d, Has pending: %d", pending_mode, has_pending);
+  RCLCPP_INFO(rclcpp::get_logger("motion_control"), "has_finished_walk: %d, has_finished_turn: %d, request_to_stop_walk: %d", has_finished_walk, has_finished_turn, request_to_stop_walk);
 }
 
 void MotionControl::walk() {
@@ -77,8 +78,8 @@ void MotionControl::walk() {
       if (!request_to_stop_walk) leg2_motion_done = false;
     }
   } else {
-    if (coord1.x < 3.45f) {
-      coord1.x = smov::Functions::lerp(coord1.x, 3.5f, 0.15f);
+    if (coord1.x < neutral_x_front - 0.05f) {
+      coord1.x = smov::Functions::lerp(coord1.x, neutral_x_front, 0.15f);
       trig.set_leg_to(1, coord1);
       RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 1 returning to (%f, %f, %f)", coord1.x, coord1.y, coord1.z);
     }
@@ -95,8 +96,8 @@ void MotionControl::walk() {
       if (!request_to_stop_walk) leg3_motion_done = false;
     }
   } else {
-    if (coord4.x < 3.45f) {
-      coord4.x = smov::Functions::lerp(coord4.x, 3.5f, 0.15f);
+    if (coord4.x < neutral_x_back - 0.05f) {
+      coord4.x = smov::Functions::lerp(coord4.x, neutral_x_back, 0.15f);
       trig.set_leg_to(4, coord4);
       RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 4 returning to (%f, %f, %f)", coord4.x, coord4.y, coord4.z);
     }
@@ -113,8 +114,8 @@ void MotionControl::walk() {
       if (!request_to_stop_walk) leg1_motion_done = false;
     }
   } else {
-    if (coord2.x < 3.45f) {
-      coord2.x = smov::Functions::lerp(coord2.x, 3.5f, 0.15f);
+    if (coord2.x < neutral_x_front - 0.05f) {
+      coord2.x = smov::Functions::lerp(coord2.x, neutral_x_front, 0.15f);
       trig.set_leg_to(2, coord2);
       RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 2 returning to (%f, %f, %f)", coord2.x, coord2.y, coord2.z);
     }
@@ -131,8 +132,8 @@ void MotionControl::walk() {
       if (!request_to_stop_walk) leg4_motion_done = false;
     }
   } else {
-    if (coord3.x < 3.45f) {
-      coord3.x = smov::Functions::lerp(coord3.x, 3.5f, 0.15f);
+    if (coord3.x < neutral_x_back - 0.05f) {
+      coord3.x = smov::Functions::lerp(coord3.x, neutral_x_back, 0.15f);
       trig.set_leg_to(3, coord3);
       RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 3 returning to (%f, %f, %f)", coord3.x, coord3.y, coord3.z);
     }
@@ -156,8 +157,8 @@ void MotionControl::curve(bool is_left) {
       if (!request_to_stop_walk) leg2_motion_done = false;
     }
   } else {
-    if (coord1.x < 3.45f) {
-      coord1.x = smov::Functions::lerp(coord1.x, 3.5f, 0.15f);
+    if (coord1.x < neutral_x_front - 0.05f) {
+      coord1.x = smov::Functions::lerp(coord1.x, neutral_x_front, 0.15f);
       coord1.z = smov::Functions::lerp(coord1.z, z_return, 0.1f);
       trig.set_leg_to(1, coord1);
       RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 1 returning to (%f, %f, %f)", coord1.x, coord1.y, coord1.z);
@@ -176,8 +177,8 @@ void MotionControl::curve(bool is_left) {
       if (!request_to_stop_walk) leg3_motion_done = false;
     }
   } else {
-    if (coord4.x < 3.45f) {
-      coord4.x = smov::Functions::lerp(coord4.x, 3.5f, 0.15f);
+    if (coord4.x < neutral_x_back - 0.05f) {
+      coord4.x = smov::Functions::lerp(coord4.x, neutral_x_back, 0.15f);
       coord4.z = smov::Functions::lerp(coord4.z, z_return, 0.1f);
       trig.set_leg_to(4, coord4);
       RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 4 returning to (%f, %f, %f)", coord4.x, coord4.y, coord4.z);
@@ -196,8 +197,8 @@ void MotionControl::curve(bool is_left) {
       if (!request_to_stop_walk) leg1_motion_done = false;
     }
   } else {
-    if (coord2.x < 3.45f) {
-      coord2.x = smov::Functions::lerp(coord2.x, 3.5f, 0.15f);
+    if (coord2.x < neutral_x_front - 0.05f) {
+      coord2.x = smov::Functions::lerp(coord2.x, neutral_x_front, 0.15f);
       coord2.z = smov::Functions::lerp(coord2.z, z_return, 0.1f);
       trig.set_leg_to(2, coord2);
       RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 2 returning to (%f, %f, %f)", coord2.x, coord2.y, coord2.z);
@@ -216,8 +217,8 @@ void MotionControl::curve(bool is_left) {
       if (!request_to_stop_walk) leg4_motion_done = false;
     }
   } else {
-    if (coord3.x < 3.45f) {
-      coord3.x = smov::Functions::lerp(coord3.x, 3.5f, 0.15f);
+    if (coord3.x < neutral_x_back - 0.05f) {
+      coord3.x = smov::Functions::lerp(coord3.x, neutral_x_back, 0.15f);
       coord3.z = smov::Functions::lerp(coord3.z, z_return, 0.1f);
       trig.set_leg_to(3, coord3);
       RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Leg 3 returning to (%f, %f, %f)", coord3.x, coord3.y, coord3.z);
@@ -340,6 +341,7 @@ void MotionControl::wake_up() {
   smov::delay(2000);
   mode = STANDING;
   stabilize_legs();
+  request_to_stop_walk = false;  // Ensure no stop request after wake up
 }
 
 void MotionControl::on_start() {
@@ -409,34 +411,41 @@ void MotionControl::on_loop() {
     }
   }
 
-  // Queue new mode if different from current
-  if (desired_mode != STANDING && desired_mode != mode) {
-    RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Queueing new mode: %d", desired_mode);
-    pending_mode = desired_mode;
-    has_pending = true;
-    request_to_stop_walk = true;
+  // Handle mode change
+  if (desired_mode != STANDING) {
+    if (mode == STANDING) {
+      // Immediate transition from STANDING
+      mode = desired_mode;
+      request_to_stop_walk = false;
+      done_once = false;
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Direct transition from STANDING to mode %d", mode);
+    } else if (desired_mode != mode) {
+      // Queue for ongoing modes
+      pending_mode = desired_mode;
+      has_pending = true;
+      request_to_stop_walk = true;
+      RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Queueing new mode: %d", desired_mode);
+    }
   }
 
   output_coordinates();
 
   // Check if current motion is complete
-  if (smov::Functions::approx(coord1.x, 3.5f, 0.06f) && smov::Functions::approx(coord2.x, 3.5f, 0.06f) 
-    && smov::Functions::approx(coord3.x, 3.5f, 0.06f) && smov::Functions::approx(coord4.x, 3.5f, 0.06f) && request_to_stop_walk) {
-    has_finished_walk = true;
-  } else {
-    has_finished_walk = false;
-  }
+  has_finished_walk = smov::Functions::approx(coord1.x, neutral_x_front, 0.06f) &&
+                      smov::Functions::approx(coord2.x, neutral_x_front, 0.06f) &&
+                      smov::Functions::approx(coord3.x, neutral_x_back, 0.06f) &&
+                      smov::Functions::approx(coord4.x, neutral_x_back, 0.06f) &&
+                      request_to_stop_walk;
 
-  if (smov::Functions::approx(coord1.z, 5.0f, 0.06f) && smov::Functions::approx(coord2.z, 5.0f, 0.06f) 
-    && smov::Functions::approx(coord3.z, 5.0f, 0.06f) && smov::Functions::approx(coord4.z, 5.0f, 0.06f) && request_to_stop_walk) {
-    has_finished_turn = true;
-  } else {
-    has_finished_turn = false;
-  }
+  has_finished_turn = smov::Functions::approx(coord1.z, 5.0f, 0.06f) &&
+                      smov::Functions::approx(coord2.z, 5.0f, 0.06f) &&
+                      smov::Functions::approx(coord3.z, 5.0f, 0.06f) &&
+                      smov::Functions::approx(coord4.z, 5.0f, 0.06f) &&
+                      request_to_stop_walk;
 
   // Execute current mode
   if (mode == WALKING) {
-    if (done_once == false) {
+    if (!done_once) {
       leg1_motion_done = false;
       leg4_motion_done = false;
       done_once = true;
@@ -444,7 +453,7 @@ void MotionControl::on_loop() {
     }
     walk();
   } else if (mode == CURVING_LEFT) {
-    if (done_once == false) {
+    if (!done_once) {
       leg1_motion_done = false;
       leg4_motion_done = false;
       done_once = true;
@@ -452,7 +461,7 @@ void MotionControl::on_loop() {
     }
     curve(true);
   } else if (mode == CURVING_RIGHT) {
-    if (done_once == false) {
+    if (!done_once) {
       leg1_motion_done = false;
       leg4_motion_done = false;
       done_once = true;
@@ -460,7 +469,7 @@ void MotionControl::on_loop() {
     }
     curve(false);
   } else if (mode == TURNING_RIGHT) {
-    if (done_once == false) {
+    if (!done_once) {
       leg1_motion_done = false;
       leg4_motion_done = false;
       done_once = true;
@@ -468,7 +477,7 @@ void MotionControl::on_loop() {
     }
     turn();
   } else if (mode == TURNING_LEFT) {
-    if (done_once == false) {
+    if (!done_once) {
       leg2_motion_done = false;
       leg3_motion_done = false;
       done_once = true;
@@ -481,11 +490,11 @@ void MotionControl::on_loop() {
   if (has_finished_walk && has_finished_turn && request_to_stop_walk) {
     mode = STANDING;
     done_once = false;
+    request_to_stop_walk = false;
     if (has_pending) {
       RCLCPP_INFO(rclcpp::get_logger("motion_control"), "Switching to pending mode: %d", pending_mode);
       mode = pending_mode;
       has_pending = false;
-      request_to_stop_walk = false;
       done_once = false;
     }
   }
