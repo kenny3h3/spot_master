@@ -12,7 +12,7 @@ smov_config:
     FRONT_BODY_RIGHT:      [15,  330,    220,     1,         0,                                     90,                    135]
 
     FRONT_UPPER_LEG_LEFT:  [1,   375,    310,     1,         0,                                     40,                    155]
-    FRONT_UPPER_LEG_RIGHT: [14,  250,    310,     -1,        0,                                     40,                    155]
+    FRONT_UPPER_LEG_RIGHT: [14,  255,    310,     -1,        0,                                     40,                    155]
 
     FRONT_LOWER_LEG_LEFT:  [2,   320,    440,      1,        -1,                                    105,                   190]
     FRONT_LOWER_LEG_RIGHT: [13,  350,    440,     -1,        -1,                                    105,                   190]
