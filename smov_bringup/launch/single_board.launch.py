@@ -24,8 +24,8 @@ def generate_launch_description():
             parameters=[config],
             prefix="bash -c 'sleep 2.0; $0 $@'"
         ),
-        #Node(
-        #    package='smov_lcd_panel',
-        #    executable='node',
-        #)
+        Node(
+            package='smov_lcd_panel',
+            executable='node',
+        )
     ])
