@@ -38,7 +38,7 @@ class ForwardMotion {
 
   float back_leg_gap = 0.0f;
   // Stand-Basis (größer = tieferer Stand)
-  float neutral_y = 22.5f;   // vorher effektiv 23.0
+  float neutral_y = 22.0f;   // vorher effektiv 23.0
   
   // Neutralposition vor/zurück (kleiner = Füße weiter hinten)
   float neutral_x_front = 3.5f;   // vorher 3.5
