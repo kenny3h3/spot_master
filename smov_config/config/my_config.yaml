@@ -8,23 +8,23 @@ smov_config:
     back_board_i2c_bus: 4
 
     #                      Port, Center, Range,   Direction, Default value on Start (Proportional), Base (centered) angle, Max angle (The highest angle possible relative to the trigonometry package)
-    FRONT_BODY_LEFT:       [0,   355,    220,     -1,        0,                                     90,                    135]
-    FRONT_BODY_RIGHT:      [15,  355,    220,     1,         0,                                     90,                    135]
+    FRONT_BODY_LEFT:       [0,   355,    180,     -1,        0,                                     90,                    135]
+    FRONT_BODY_RIGHT:      [15,  355,    180,     1,         0,                                     90,                    135]
 
     FRONT_UPPER_LEG_LEFT:  [1,   410,    440,     1,         0,                                     35,                    155]
     FRONT_UPPER_LEG_RIGHT: [14,  255,    440,     -1,        0,                                     35,                    155]
 
-    FRONT_LOWER_LEG_LEFT:  [2,   320,    440,     1,        -1,                                     105,                   190]
-    FRONT_LOWER_LEG_RIGHT: [13,  350,    440,     -1,        -1,                                    105,                   190]
+    FRONT_LOWER_LEG_LEFT:  [2,   310,    400,     1,        -1,                                     135,                   180]
+    FRONT_LOWER_LEG_RIGHT: [13,  410,    390,     -1,        -1,                                    130,                   180]
 
     BACK_BODY_LEFT:        [7,   370,    220,     1,         0,                                     90,                    135]
     BACK_BODY_RIGHT:       [8,   300,    220,     -1,        0,                                     90,                    135]
 
-    BACK_UPPER_LEG_LEFT:   [6,   365,    310,     1,         0,                                     35,                    155]
-    BACK_UPPER_LEG_RIGHT:  [9,   370,    310,     -1,        0,                                     35,                    155]
+    BACK_UPPER_LEG_LEFT:   [6,   365,    440,     1,         0,                                     35,                    155]
+    BACK_UPPER_LEG_RIGHT:  [9,   370,    440,     -1,        0,                                     35,                    155]
 
-    BACK_LOWER_LEG_LEFT:   [5,   380,    440,     1,         -1,                                    105,                   190]
-    BACK_LOWER_LEG_RIGHT:  [10,  390,    440,     -1,        -1,                                    105,                   190]
+    BACK_LOWER_LEG_LEFT:   [5,   365,    380,     1,         -1,                                    135,                   190]
+    BACK_LOWER_LEG_RIGHT:  [10,  440,    370,     -1,        -1,                                    135,                   190]
 
 smov_states:  
   ros__parameters:
