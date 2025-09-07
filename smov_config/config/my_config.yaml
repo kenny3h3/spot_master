@@ -8,7 +8,7 @@ smov_config:
     back_board_i2c_bus: 4
 
     #                      Port, Center, Range,   Direction, Default value on Start (Proportional), Base (centered) angle, Max angle (The highest angle possible relative to the trigonometry package)
-    FRONT_BODY_LEFT:       [0,   355,    180,     -1,        0,                                     90,                    135]
+    FRONT_BODY_LEFT:       [0,   345,    180,     -1,        0,                                     90,                    135]
     FRONT_BODY_RIGHT:      [15,  365,    180,     1,         0,                                     90,                    135]
 
     FRONT_UPPER_LEG_LEFT:  [1,   410,    440,     1,         0,                                     35,                    155]
