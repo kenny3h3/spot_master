@@ -18,7 +18,7 @@ smov_config:
     FRONT_LOWER_LEG_RIGHT: [13,  455,    390,     -1,        -1,                                     110,                   190]
 
     BACK_BODY_LEFT:        [15,  310,    220,     1,         0,                                     90,                    135]
-    BACK_BODY_RIGHT:       [0,   300,    220,     -1,        0,                                     90,                    135]
+    BACK_BODY_RIGHT:       [0,   360,    220,     -1,        0,                                     90,                    135]
 
     BACK_UPPER_LEG_LEFT:   [14,  350,    440,     1,         0,                                     35,                    155]
     BACK_UPPER_LEG_RIGHT:  [1,   380,    440,     -1,        0,                                     35,                    155]
