@@ -20,11 +20,11 @@ smov_config:
     BACK_BODY_LEFT:        [15,  306,    219,     1,         0,                                     90,                    135]
     BACK_BODY_RIGHT:       [0,   366,    222,     -1,        0,                                     90,                    135]
 
-    BACK_UPPER_LEG_LEFT:   [14,  350,    440,     1,         0,                                     35,                    155]
+    BACK_UPPER_LEG_LEFT:   [14,  391,    440,     1,         0,                                     35,                    155]
     BACK_UPPER_LEG_RIGHT:  [1,   263,    440,     -1,        0,                                     35,                    155]
 
-    BACK_LOWER_LEG_LEFT:   [13,  380,    380,     1,         0,                                     110,                   190]
-    BACK_LOWER_LEG_RIGHT:  [2,   442,    370,     -1,        0,                                     110,                   190]
+    BACK_LOWER_LEG_LEFT:   [13,  278,    246,     1,         0,                                     110,                   190]
+    BACK_LOWER_LEG_RIGHT:  [2,   442,    240,     -1,        0,                                     110,                   190]
 
 smov_states:  
   ros__parameters:
