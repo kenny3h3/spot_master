@@ -38,11 +38,11 @@ class ForwardMotion {
 
   float back_leg_gap = 0.0f;
   // Stand-Basis (größer = tieferer Stand)
-  float neutral_y = 22.0f;   // vorher effektiv 23.0
+  float neutral_y = 23.0f;   // vorher effektiv 23.0
   
   // Neutralposition vor/zurück (kleiner = Füße weiter hinten)
   float neutral_x_front = 3.5f;   // vorher 3.5
-  float neutral_x_back  = 3.5f;   // optional leicht anders für hinten
+  float neutral_x_back  = 3.7f;   // optional leicht anders für hinten
  
   Mode mode = SITTING_DOWN;
   smov::TrigonometryState trig = smov::TrigonometryState(&front_servos, &back_servos, &front_state_publisher, &back_state_publisher, &upper_leg_length, &lower_leg_length, &hip_body_distance);
