@@ -8,4 +8,4 @@ source /home/winston/spot_ws/install/setup.bash
 
 echo "ROS dualboard launch"
 cd /home/winston/spot_ws
-ros2 launch smov_bringup single_board.launch.py
+ros2 launch smov_bringup dual_board.launch.py

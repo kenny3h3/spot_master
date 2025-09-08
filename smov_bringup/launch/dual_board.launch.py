@@ -13,7 +13,7 @@ def generate_launch_description():
         Node(
             package='i2c_pwm_board',
             executable='node',
-            arguments=['6'], #Changed from 1 after burn through
+            arguments=['1'], #Changed from 1 after burn through
         ),
         Node(
             package='i2c_pwm_board',
