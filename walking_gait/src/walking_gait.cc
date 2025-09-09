@@ -199,8 +199,8 @@ void ForwardMotion::wake_up() {
     front_servos.value[i] = 90.0f;
     front_servos.value[i + 2] = 55.0f;
     front_servos.value[i + 4] = 45.0f;
-    back_servos.value[i] = 100.0f;
-    back_servos.value[i + 2] = 120.0f;
+    back_servos.value[i] = 120.0f;
+    back_servos.value[i + 2] = 150.0f;
     back_servos.value[i + 4] = 45.0f;
   }
   
