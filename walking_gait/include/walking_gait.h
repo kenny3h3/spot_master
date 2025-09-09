@@ -36,7 +36,7 @@ class ForwardMotion {
   void turn();
   void wake_up();
 
-  float back_leg_gap = 1.0f;
+  float back_leg_gap = 2.5f;
   // Stand-Basis (größer = tieferer Stand)
   float neutral_y = 23.0f;   // vorher effektiv 23.0
   
