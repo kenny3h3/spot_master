@@ -11,4 +11,4 @@ cd /home/winston/spot_ws
 ros2 launch smov_bringup dual_board.launch.py
 
 echo "IMU launch"
-ros2 launch bno085_imu.py imu.launch.py
+ros2 launch bno085_imu_py imu.launch.py
